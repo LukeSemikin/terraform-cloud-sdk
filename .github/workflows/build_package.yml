@@ -26,7 +26,7 @@ jobs:
       - name : Fetch Release Number 
         id: release_number
         run: |
-          version=$(awk '/version = /{print $NF}' pyproject.toml | tr -d '"')
+          version="$(awk '/version = /{print $NF}' pyproject.toml | tr -d '"')"
 
       - name: Create Github Release
         uses: actions/create-release@v1
