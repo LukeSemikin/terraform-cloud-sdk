@@ -1,0 +1,41 @@
+name: Build PyPi Package
+on:
+  push: 
+    branches:
+      - main
+    paths: 
+      - src/**
+      - tests/**
+      - pyproject.toml
+jobs:
+
+  build_package:
+    runs-on:
+      - ubuntu-latest
+
+    steps: 
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Build PyPi Package
+        run: |
+          python3 -m pip install --upgrade build
+          python3 -m build
+
+      - name : Fetch Release Number 
+        id: release_number
+        run: |
+          version=$(awk '/version = /{print $NF}' pyproject.toml | tr -d '"')
+
+      - name: Create Github Release
+        uses: actions/create-release@v1
+        env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with: 
+          tag_name: ${{ steps.release_number.outputs.version }}
+          release_name: v${{ steps.release_number.outputs.version }}
+          body: |
+            Github Release for v${{ steps.release_number.outputs.version }}
+          draft: false
+          prerelease: false
