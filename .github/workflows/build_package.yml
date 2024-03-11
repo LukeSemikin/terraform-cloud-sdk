@@ -1,6 +1,8 @@
 name: Build PyPi Package
 on:
   push: 
+    branches:
+      - main
     paths: 
       - src/**
       - tests/**
