@@ -1,4 +1,4 @@
-from requests import * 
+from requests import Session
 
 class Authentication:
 
