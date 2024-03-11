@@ -68,8 +68,6 @@ class TestWorkspaces(TestCase):
         workspace_id = loads(self.runner.show_workspace(self.test_workspace_name).content)['data']['id']
         rsc_workspace_id = loads(self.runner.show_workspace(f"{self.test_workspace_name}-rsc").content)['data']['id']
         self.assertEqual(204, self.runner.delete_remote_state_consumers(workspace_id, rsc_workspace_id))
-       
-    def add_tags(self):
 
     # def test_force_unlock_workspace(self):
     #     workspace_id = loads(self.runner.show_workspace(self.test_workspace_name).content)['data']['id']
