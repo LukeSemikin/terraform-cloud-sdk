@@ -8,7 +8,8 @@ on:
 jobs: 
 
   run_test_suite:
-    runs-on: ubuntu-latest
+    runs-on:
+      - ubuntu-latest
 
     steps: 
 
@@ -18,6 +19,4 @@ jobs:
       - name: Run Test Suite
         run: |
           sudo apt install python3
-          sudo apt install pip 
-          pip install requirements.txt
           python3 -m unittest tests/test_workspaces.py  -v 
