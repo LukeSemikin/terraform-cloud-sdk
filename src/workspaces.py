@@ -202,17 +202,17 @@ class Workspaces:
     def unassign_ssh_key(self, workspace_id):
         self.assign_ssh_key(workspace_id=workspace_id, key_id=None)
 
-    def update_remote_state_consumers(self, workspace_id):
-        payload = {
+    def update_remote_state_consumers(self, workspace_id, remote_consumer):
+        payload = dumps({
             "data" : [
                 {
-                    "id": workspace_id,
+                    "id": remote_consumer,
                     "type": "workspaces"
                 }
             ]
-        }.dumps()
+        })
         url = f"{self.base_url}/workspaces/{workspace_id}/relationships/remote-state-consumers"
-        self.tf_session.patch(url=url, data=payload)
+        return self.tf_session.patch(url=url, data=payload).status_code
 
         
 #Delete Requests
@@ -224,17 +224,17 @@ class Workspaces:
             url = f"{self.base_url}organizations/{self.organisation}/workspaces/{identifier}/actions/safe-delete"
         self.tf_session.delete(url=url)
 
-    def delete_remote_state_consumers(self, workspace_id):
-        payload = {
+    def delete_remote_state_consumers(self, workspace_id, remote_consumer):
+        payload = dumps({
             "data" : [
                 {
-                    "id": workspace_id,
+                    "id": remote_consumer,
                     "type": "workspaces"
                 }
             ]
-        }.dumps()
+        })
         url = f"{self.base_url}/workspaces/{workspace_id}/relationships/remote-state-consumers"
-        self.tf_session.delete(url=url, data=payload)
+        return self.tf_session.delete(url=url, data=payload).status_code
 
     def delete_workspace_tags(self, workspace_id, **tags):
         payload = self.form_tags_dataset(tags=tags)
