@@ -90,23 +90,17 @@ class Workspaces:
             payload.update({"relationships": { "projects": { "data": data } }})
         return dumps(payload)
     
-    def form_tags_dataset(self, **tags):
-        tags = {}
-        for key, value in tags:
-            tags.update({
+    def form_tags_dataset(self, **kwargs):
+        payload = {'data': []}
+        for value in kwargs['kwargs']['tags']:
+            tags = {
                 "type": "tags",
                 "attributes": {
                     "name": value
                 }
-            })
-        payload = {
-            "data": [
-                tags
-            ]
-        }
+            }
+            payload['data'] += [tags]
         return dumps(payload)
-
-        
 
 #Get Requests
 
@@ -130,7 +124,7 @@ class Workspaces:
     
     def get_workspace_tags(self, workspace_id):
         url = f"{self.base_url}workspaces/{workspace_id}/relationships/tags"
-        return self.get(url=url)
+        return self.tf_session.get(url=url)
     
 #Post Requests
     
@@ -145,7 +139,7 @@ class Workspaces:
             url = f"{self.base_url}workspaces/{identifier}/actions/safe-delete"
         else:
             url = f"{self.base_url}organizations/{self.organisation}/workspaces/{identifier}/actions/safe-delete"
-        self.tf_session.post(url=url)  
+        return self.tf_session.post(url=url).status_code 
     
     def lock_workspace(self, workspace_id, reason):
         url = f"{self.base_url}workspaces/{workspace_id}/actions/lock"
@@ -174,10 +168,10 @@ class Workspaces:
         url = f"{self.base_url}/workspaces/{workspace_id}/relationships/remote-state-consumers"
         return self.tf_session.post(url=url, data=payload)
 
-    def add_tags(self, workspace_id, **tags):
-        payload = self.form_tags_dataset(tags)
+    def add_tags(self, workspace_id, **kwargs):
+        payload = self.form_tags_dataset(kwargs=kwargs)
         url = f"{self.base_url}workspaces/{workspace_id}/relationships/tags"
-        self.tf_session.post(url=url, data=payload)
+        return self.tf_session.post(url=url, data=payload).status_code
 
 #Patch Requests
     
@@ -188,14 +182,14 @@ class Workspaces:
         self.tf_session.patch(data=payload, url=url)
 
     def assign_ssh_key(self, workspace_id, key_id):
-        payload = {
+        payload = dumps({
             "data": {
                 "attributes": {
                     "id": key_id
                 },
                 "type": "workspaces"
             }
-        }.dumps()
+        })
         url = f"{self.base_url}/workspaces/{workspace_id}/relationships/ssh-key"
         self.tf_session.patch(url=url, data=payload)
 
@@ -222,7 +216,7 @@ class Workspaces:
             url = f"{self.base_url}workspaces/{identifier}/actions/safe-delete"
         else:
             url = f"{self.base_url}organizations/{self.organisation}/workspaces/{identifier}/actions/safe-delete"
-        self.tf_session.delete(url=url)
+        return self.tf_session.delete(url=url).status_code
 
     def delete_remote_state_consumers(self, workspace_id, remote_consumer):
         payload = dumps({
@@ -237,6 +231,6 @@ class Workspaces:
         return self.tf_session.delete(url=url, data=payload).status_code
 
     def delete_workspace_tags(self, workspace_id, **tags):
-        payload = self.form_tags_dataset(tags=tags)
+        payload = self.form_tags_dataset(kwargs=tags)
         url = f"{self.base_url}workspaces/{workspace_id}/relationships/tags"
-        self.tf_session.delete(url=url, data=payload)
+        return self.tf_session.delete(url=url, data=payload).status_code
